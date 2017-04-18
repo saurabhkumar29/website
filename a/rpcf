@@ -1,0 +1,40 @@
+//fact.x
+
+struct s
+{
+	int a;
+
+};
+
+program FACT_PROG{
+	version FACT_VERS{
+		int FACTORIAL(s)=1;
+	}=1;
+}=0x12345678;
+//$ rpcgen -a -C fact.x
+
+
+//fact_client.c
+printf("Enter N:");
+scanf("%d",&(factorial_1_arg.a));
+
+else
+	{
+		printf("factorial: %d\n",*result_1);
+	}
+
+//fact_server.c
+int ans=1;
+	 int i;
+	 for(i=1;i<=(argp->a);i++){
+	 	ans=ans*i;
+	 }
+	 result=ans;
+	 
+	 printf("%d ! = %d\n",(argp->a),ans);
+
+//$ make -f Makefile.fact
+//$ ./fact_server
+
+//$ ./fact_client 127.0.0.1
+

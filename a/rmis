@@ -1,0 +1,79 @@
+//SC.java
+import java.rmi.*;
+
+
+public class SC
+{
+	public static void main(String args[])
+	{
+		try
+		{
+			String sumServerURL="rmi://" +args[0]+ "/SUM-SERVER";
+			SSI sumServerIntf=(SSI)Naming.lookup(sumServerURL);
+			System.out.println("The first string is:" +args[1]);
+			String m=args[1];
+			System.out.println("The second string is:" +args[2]);
+			String n=args[2];
+			System.out.println("The sum is:" +sumServerIntf.sum(m,n));
+		
+		}
+		catch(Exception e)
+		{
+			System.out.println("Exception" +e);
+		
+		}
+	}
+}
+//SS.java
+import java.net.*;
+import java.rmi.*;
+
+public class SS
+{
+	public static void main(String args[])
+	{
+		try
+		{
+			SSIm sumServerImpl=new SSIm();
+			Naming.rebind("SUM-SERVER",sumServerImpl);
+		}
+		catch(Exception e)
+		{
+			System.out.println("Exception:" +e);
+		}
+	}
+}
+//SSI.java
+import java.rmi.*;
+
+public interface SSI extends Remote
+{
+	String sum(String m, String n) throws RemoteException;
+}
+//SSIm.java
+import java.rmi.*;
+import java.rmi.server.*;
+
+public class SSIm extends UnicastRemoteObject implements SSI
+{
+	public SSIm() throws RemoteException{}
+		public String sum(String m, String n) throws RemoteException
+		{
+			return m+n;
+		}
+}
+
+//output
+govind@govind-Inspiron-3521:~/Desktop/ds/3/StringConcat$ rmiregistry &
+[1] 2785
+govind@govind-Inspiron-3521:~/Desktop/ds/3/StringConcat$ 
+
+//client
+govind@govind-Inspiron-3521:~/Desktop/ds/3/StringConcat$ java SC 127.0.0.1 guru pawar
+The first string is:guru
+The second string is:pawar
+The sum is:gurupawar
+govind@govind-Inspiron-3521:~/Desktop/ds/3/StringConcat$ 
+//server
+govind@govind-Inspiron-3521:~/Desktop/ds/3/StringConcat$ javac *.java
+govind@govind-Inspiron-3521:~/Desktop/ds/3/StringConcat$ java SS

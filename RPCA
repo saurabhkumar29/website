@@ -1,0 +1,97 @@
+//add.x
+struct numbers{
+	int a;
+	int b;
+	int ch;	
+};
+
+program ADDITION{
+		version ADDITION_1{
+			int ADD(numbers)=1;
+		}=1;
+	
+}=64646;
+
+//add_client.c
+#include "add.h"
+
+
+void
+addition_1(char *host,int x,int y,int ch)
+{
+	CLIENT *clnt;
+	int  *result_1;
+	numbers  add_1_arg;
+
+#ifndef	DEBUG
+	clnt = clnt_create (host, ADDITION, ADDITION_1, "udp");
+	if (clnt == NULL) {
+		clnt_pcreateerror (host);
+		exit (1);
+	}
+#endif	/* DEBUG */
+	add_1_arg.a=x;
+	add_1_arg.b=y;
+	add_1_arg.ch=ch;
+	result_1 = add_1(&add_1_arg, clnt);
+	if (result_1 == (int *) NULL) {
+		clnt_perror (clnt, "call failed");
+	}
+	else 
+	{
+		printf("\nResult is %d",*result_1);
+	}
+
+#ifndef	DEBUG
+	clnt_destroy (clnt);
+#endif	 /* DEBUG */
+}
+
+
+int
+main (int argc, char *argv[])
+{
+	char *host;
+
+	if (argc < 5) {
+		printf ("usage: %s server_host\n", argv[0]);
+		exit (1)
+;
+	}
+	host = argv[1];
+	addition_1 (host,atoi(argv[2]),atoi(argv[3]),atoi(argv[4]));
+exit (0);
+}
+
+//add_server.c
+#include "add.h"
+
+int *
+add_1_svc(numbers *argp, struct svc_req *rqstp)
+{
+	static int  result;
+
+	if(argp->ch==1)
+	{
+		printf("\nAddition is \t:");
+		result=argp->a+argp->b;
+	}
+	else if(argp->ch==2)
+	{
+		printf("\nSubstraction is \t:");
+		result=argp->a-argp->b;
+	}
+	else
+	{
+		printf("Wrong Choice Entered");
+	}
+
+	return &result;
+}
+//output
+//$ rpcgen -a -C add.x
+//$ make -f Makefile.add
+//$ sudo ./add_server
+//
+//$./add_client 127.0.0.1 1 2 1
+

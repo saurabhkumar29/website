@@ -1,0 +1,90 @@
+//uppercase.x
+struct inputString {
+	string inWord<>;
+	int length;
+};
+
+struct outString {
+	string outWord<>;
+};
+
+program LOWERTOUPPERCASEPROG {
+	version LOWERTOUPPERCASEPROGVERSION {
+		struct outString lowertoupper(struct inputString)=1;
+	}=1;
+}=463874;
+//client.c
+#include "uppercase.h"
+#include <string.h>
+
+void toUpperProgram(char *host, char *input, int len) {
+	CLIENT *clnt;
+	inputString iString;
+	outString *oString;
+	
+	iString.length = len;
+	iString.inWord = (char *)malloc(len * sizeof(char));
+	strcpy(iString.inWord, input);
+	
+	if((clnt = clnt_create(host, LOWERTOUPPERCASEPROG, LOWERTOUPPERCASEPROGVERSION, "tcp")) == NULL) {
+		clnt_pcreateerror(host);
+		exit(1);
+	}
+	
+	if((oString = lowertoupper_1(&iString,clnt)) == (outString *)NULL)
+		clnt_perror(clnt, "Error: Call failed.");
+	else
+		printf("Result: %s.\n",oString->outWord);
+	
+	clnt_destroy(clnt);
+}
+
+int main(int argc, char *argv[]) {
+	if (argc < 3) {
+		exit(1);
+	}
+	
+	toUpperProgram(argv[1], argv[2], strlen(argv[2]));
+	return 0;
+}
+//server.c
+#include "uppercase.h"
+#include <ctype.h>
+
+void convert(char *s){
+	while(*s != '\0'){
+		*s = toupper(*s);
+		s++;
+	}
+}
+
+outString *lowertoupper_1_svc(inputString *inArg, struct svc_req *rqstp) {
+	static outString result;
+	char *temp = (char *)malloc(inArg->length * sizeof(char));
+	result.outWord = (char *)malloc(inArg->length * sizeof(char));
+	strcpy(temp,inArg->inWord);
+	result.outWord = temp;
+	convert(temp);
+	return &result;
+}
+
+//output
+BEIT26@BEIT26:~$ cd RPC
+BEIT26@BEIT26:~/RPC$ cd Lower\ to\ Upper\ Case/
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ rpcgen -C uppercase.x
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ cc -c client.c -o client.o
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ cc -c uppercase_xdr.c -o uppercase_xdr.o
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ cc -c uppercase_clnt.c -o uppercase_clnt.o
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ cc -o Client client.o uppercase_xdr.o uppercase_clnt.o -lnsl
+
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ cc -c server.c -o server.o
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ cc -c uppercase_svc.c -o uppercase_svc.o
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ cc -o Server server.o uppercase_svc.o uppercase_xdr.o -lnsl
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ ./Server
+
+BEIT26@BEIT26:~$ cd RPC
+BEIT26@BEIT26:~/RPC$ cd Lower\ to\ Upper\ Case/
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ ./Client 127.0.0.1 "guru"
+Result: GURU
+BEIT26@BEIT26:~/RPC/Lower to Upper Case$ 
+

@@ -1,0 +1,81 @@
+//CharMap.java
+package exp5a;
+import java.io.IOException;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+public class CharMap extends Mapper<LongWritable, Text, Text, IntWritable> {
+	
+public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+
+	String line = value.toString();
+	char[] carr = line.toCharArray();
+	for (char c : carr) {
+			System.out.println(c);
+			context.write(new Text(String.valueOf(c)), new IntWritable(1));
+		}
+	}
+}
+//CharReduce.java
+package exp5a;
+import java.io.IOException;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+public class CharReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+public void reduce(Text key,Iterable<IntWritable>values,Context
+context)throws IOException,InterruptedException{
+int count = 0;
+IntWritable result = new IntWritable();
+for (IntWritable val : values) {
+count +=val.get();
+result.set(count);
+}
+context.write(key, result);
+}
+}
+//CharCount.java
+package exp5a;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+public class CharCount {
+public static void main(String[] args) throws Exception {
+// TODO Auto-generated method stub
+Configuration conf = new Configuration();
+@SuppressWarnings("deprecation")
+Job job = new Job(conf, "Charcount");
+job.setJarByClass(CharCount.class);
+job.setMapperClass(CharMap.class);
+job.setReducerClass(CharReduce.class);
+job.setInputFormatClass(TextInputFormat.class);
+job.setOutputFormatClass(TextOutputFormat.class);
+job.setMapOutputKeyClass(Text.class);
+job.setMapOutputValueClass(IntWritable.class);
+job.setOutputKeyClass(Text.class);
+job.setOutputValueClass(IntWritable.class);
+FileInputFormat.addInputPath(job, new Path(args[0]));
+FileOutputFormat.setOutputPath(job, new Path(args[1]));
+System.exit(job.waitForCompletion(true) ? 0 : 1);}}
+
+
+//sample.txt
+Apache Hadoop is an open-source software framework written in Java for distributed storage and distributed processing of very large data sets on computer clusters built from commodity hardware. All the modules in Hadoop are designed with a fundamental assumption that hardware failures are common and should be automatically handled by the framework.
+The core of Apache Hadoop consists of a storage part, known as Hadoop Distributed File System (HDFS), and a processing part called MapReduce. Hadoop splits files into large blocks and distributes them across nodes in a cluster. To process data, Hadoop transfers packaged code for nodes to process in parallel based on the data that needs to be processed. This approach takes advantage of data locality nodes manipulating the data they have access to allow the dataset to be processed faster and more efficiently than it would be in a more conventional supercomputer architecture that relies on a parallel file system where computation and data are distributed via high-speed networking.
+
+
+//output
+
+hduser@user-laptop:/home/snehal$ hdfs dfs -mkdir /ass5
+hduser@user-laptop:/home/snehal$ hdfs dfs -copyFromLocal sample.txt /ass5
+hduser@user-laptop:/home/snehal$ hdfs dfs -ls /ass5
+hduser@user-laptop:/home/snehal$ hdfs dfs -cat /ass5/sample.txt
+hduser@user-laptop:/home/snehal$ hadoop jar exp5a.jar exp5a.CharCount
+hduser@user-laptop:/home/snehal$ hdfs dfs -cat /ass5/output/*

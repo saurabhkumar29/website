@@ -1,0 +1,77 @@
+//reverse.x
+struct inputNumber {
+	int inNum;
+};
+
+struct outputNumber {
+	int outNum;
+};
+
+program REVERSENUMPROG {
+	version REVERSENUMPROGVERSION {
+		struct outputNumber reversenum(struct inputNumber)=1;
+	}=1;
+}=234234;
+
+//client.c
+#include "reverse.h"
+
+void reverseNumber(char *host, int num) {
+	CLIENT *clnt;
+	outputNumber *result;
+	inputNumber inArg;
+	inArg.inNum = num;
+	
+	if ((clnt = clnt_create(host, REVERSENUMPROG, REVERSENUMPROGVERSION, "tcp")) == NULL) {
+		clnt_pcreateerror(host);
+		exit(1);
+	}
+	
+	if((result = reversenum_1(&inArg,clnt)) == (outputNumber *) NULL)
+		clnt_perror(clnt,"Error: Call failed.");
+	else
+		printf("Reversed number: %d\n",result->outNum);
+	
+	clnt_destroy(clnt);
+}
+
+int main(int argc, char *argv[]){
+	if(argc < 3){
+		printf("Usage: %s <host> <number>",argv[0]);
+		exit(1);
+	}
+	reverseNumber(argv[1], atoi(argv[2]));
+	return 0;
+}
+
+//server.c
+#include "reverse.h"
+
+outputNumber *reversenum_1_svc(inputNumber *inArg, struct svc_req *rqstp) {
+	static outputNumber result;
+	int rev = 0;
+	int temp = inArg->inNum;
+	while(temp > 0){
+		rev = (rev * 10) + (temp % 10);
+		temp /= 10;
+	}
+	result.outNum = rev;
+	return &result;
+}
+
+//output
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ rpcgen -C reverse.x
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ cc -c client.c -o client.o
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ cc -c reverse_xdr.c -o reverse_xdr.o
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ cc -c reverse_clnt.c -o reverse_clnt.o
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ cc -o Client client.o reverse_xdr.o reverse_clnt.o -lnsl
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ cc -c server.c -o server.o
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ cc -c reverse_svc.c -o reverse_svc.o
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ cc -o Server server.o reverse_svc.o reverse_xdr.o -lnsl
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ ./Server
+
+
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ ./Client 192.168.0.17 "123"
+Reversed number: 321
+govind@govind-Inspiron-3521:~/Desktop/ds/2/reverse$ 
+

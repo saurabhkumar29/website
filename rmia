@@ -1,0 +1,110 @@
+//SC.java
+import java.rmi.*;
+
+public class SC
+{
+	public static void main(String args[])
+	{
+		try
+		{
+			System.out.println("1.Addition\n2.Subtraction\n3.Multiplication\n4.Division\n5.Modulos");
+			String sumServerURL="rmi://" +args[0]+ "/SUM-SERVER";
+			SSI sumServerIntf=(SSI)Naming.lookup(sumServerURL);
+			System.out.println("The first number is:" +args[1]);
+			int m=Integer.valueOf(args[1]);
+			System.out.println("The second number is:" +args[2]);
+			int n=Integer.valueOf(args[2]);
+			//System.out.println("Enter your choice:" +args[2]);
+			int ch=Integer.valueOf(args[3]);
+			System.out.println("The result is:" +sumServerIntf.arith(m,n,ch));
+		
+		}
+		catch(Exception e)
+		{
+			System.out.println("Exception" +e);
+		
+		}
+	}
+}
+//SS.java
+import java.net.*;
+import java.rmi.*;
+
+public class SS
+{
+	public static void main(String args[])
+	{
+		try
+		{
+			SSIm sumServerImpl=new SSIm();
+			Naming.rebind("SUM-SERVER",sumServerImpl);
+		}
+		catch(Exception e)
+		{
+			System.out.println("Exception:" +e);
+		}
+	}
+}
+//SSI.java
+import java.rmi.*;
+
+public interface SSI extends Remote
+{
+	int arith(int m, int n,int ch) throws RemoteException;
+}
+//SSIm.java
+import java.rmi.*;
+import java.rmi.server.*;
+
+public class SSIm extends UnicastRemoteObject implements SSI
+{
+	public SSIm() throws RemoteException{}
+		public int arith(int m, int n,int ch) throws RemoteException
+		{
+			if(ch==1)
+			return m+n;
+			else if(ch==2)
+			return m-n;
+			else if(ch==3)
+			return m*n;
+			else if(ch==4)
+			return m/n;
+			else
+			return m%n;
+		}
+}
+
+//Output
+govind@govind-Inspiron-3521:~/Desktop/ds/3/arithmatic$ rmiregistry &
+[1] 3133
+govind@govind-Inspiron-3521:~/Desktop/ds/3/arithmatic$ 
+
+//server
+govind@govind-Inspiron-3521:~/Desktop/ds/3/arithmatic$ javac *.java
+govind@govind-Inspiron-3521:~/Desktop/ds/3/arithmatic$ java SS
+//client
+govind@govind-Inspiron-3521:~/Desktop/ds/3/arithmatic$ java SC 127.0.0.1 8 2 1
+1.Addition
+2.Subtraction
+3.Multiplication
+4.Division
+5.Modulos
+The first number is:8
+The second number is:2
+The result is:10
+govind@govind-Inspiron-3521:~/Desktop/ds/3/arithmatic$ java SC 127.0.0.1 8 2 2
+1.Addition
+2.Subtraction
+3.Multiplication
+4.Division
+5.Modulos
+The first number is:8
+The second number is:2
+The result is:6
+govind@govind-Inspiron-3521:~/Desktop/ds/3/arithmatic$ java SC 127.0.0.1 8 2 3
+1.Addition
+2.Subtraction
+3.Multiplication
+4.Division
+5.Modulos
+
