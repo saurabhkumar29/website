@@ -1,0 +1,78 @@
+//RangePartitioning
+
+package pageranking;
+
+import java.sql.*;
+import java.util.*;
+public class RangePartitioning {
+	 static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+	 static final String DB_URL = "jdbc:mysql://localhost/sales";
+
+	   //  Database credentials
+	 static final String USER = "root";
+	 static final String PASS = "root";
+
+	public static void main(String[] args) {
+		Connection conn=null;
+		Statement stmt=null;
+		Scanner sc=new Scanner(System.in);
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			System.out.println("Connecting to database");
+			conn=DriverManager.getConnection(DB_URL,USER,PASS);
+			
+			System.out.println("Press 1. To view JAN 2015 sales");
+			System.out.println("Press 2. To view FEB 2015 sales");
+			int choice=sc.nextInt();
+			switch(choice)
+			{
+			case 1:System.out.println("---------------Sales---------------");
+				   stmt=conn.createStatement();
+				   String sql="select * from sales_jan2016";
+				   ResultSet rs=stmt.executeQuery(sql);
+				   while(rs.next()){
+					   int salesman_id=rs.getInt("salesman_id");
+					   String salesman_name=rs.getString("salesman_name");
+					   float sales_amount=rs.getFloat("sales_amount");
+					   String sales_date=rs.getString("sales_date");
+					   
+					   System.out.println("Salesman_id:"+salesman_id);
+					   System.out.println("Salesman_name:"+salesman_name);
+					   System.out.println("Sales_amount:"+sales_amount);
+					   System.out.println("Sales_Date:"+sales_date);
+					   System.out.println("--------------------------------------");
+				   }
+				   rs.close();
+				   stmt.close();
+				   conn.close();
+				   break;
+			case 2:System.out.println("---------------Sales---------------");
+			   stmt=conn.createStatement();
+			   sql="select * from sales_feb2016";
+			   rs=stmt.executeQuery(sql);
+			   while(rs.next()){
+				   int salesman_id=rs.getInt("salesman_id");
+				   String salesman_name=rs.getString("salesman_name");
+				   float sales_amount=rs.getFloat("sales_amount");
+				   String sales_date=rs.getString("sales_date");
+				   
+				   System.out.println("Salesman_id:"+salesman_id);
+				   System.out.println("Salesman_name:"+salesman_name);
+				   System.out.println("Sales_amount:"+sales_amount);
+				   System.out.println("Sales_Date:"+sales_date);
+				   System.out.println("--------------------------------------");
+			   }
+			   rs.close();
+			   stmt.close();
+			   conn.close();
+			   break;
+			default:System.out.println("Invalid choice");
+			}
+			
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+}
