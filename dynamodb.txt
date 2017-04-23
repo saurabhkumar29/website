@@ -1,0 +1,320 @@
+1. Create customer table Customer
+(Cust_id,Cust_name,address,city,state,zipcode)
+
+Create Table(Input)
+
+var params = {
+TableName : "Customer",
+KeySchema: [
+{ AttributeName: "Cust_id", KeyType: "HASH" }, //Partition key
+{ AttributeName: "Cust_name", KeyType: "RANGE" } //Sort key
+],
+AttributeDefinitions: [
+{ AttributeName: "Cust_id", AttributeType: "S" },
+{ AttributeName: "Cust_name", AttributeType: "S" }
+],
+ProvisionedThroughput: {
+ReadCapacityUnits: 1,
+WriteCapacityUnits: 1
+}
+};
+dynamodb.createTable(params, function(err, data) {
+if (err)
+console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));
+});
+
+OUTPUT
+
+{
+  "TableDescription": {
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "Cust_id",
+        "AttributeType": "S"
+      },
+      {
+        "AttributeName": "Cust_name",
+        "AttributeType": "S"
+      }
+    ],
+    "TableName": "Customer",
+    "KeySchema": [
+      {
+        "AttributeName": "Cust_id",
+        "KeyType": "HASH"
+      },
+      {
+        "AttributeName": "Cust_name",
+        "KeyType": "RANGE"
+      }
+    ],
+    "TableStatus": "ACTIVE",
+    "CreationDateTime": "2016-01-20T03:54:13.069Z",
+    "ProvisionedThroughput": {
+      "LastIncreaseDateTime": "1970-01-01T00:00:00.000Z",
+      "LastDecreaseDateTime": "1970-01-01T00:00:00.000Z",
+      "NumberOfDecreasesToday": 0,
+      "ReadCapacityUnits": 1,
+      "WriteCapacityUnits": 1
+    },
+    "TableSizeBytes": 0,
+    "ItemCount": 0,
+    "TableArn": "arn:aws:dynamodb:ddblocal:000000000000:table/Customer"
+  }
+}
+
+#########################################################################
+
+2. Insert Items in Customer table
+
+
+PutItem
+
+var params = {
+TableName: "Customer",
+Item: {
+"Cust_id":"100",
+"Cust_name":"Ravi",
+"Address":"Sinhgad Road",
+"City": "Pune",
+"State": "Maharashtra",
+"Zipcode": "411041",
+ } };
+dynamodb.putItem(params, function(err, data) {
+if (err)
+console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));
+});
+
+
+
+########################################################################################
+3. List all inserted items form customer.
+
+var params = {
+TableName: "Customer"
+};
+dynamodb.scan(params, function(err, data) {
+if (err)
+console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));
+});
+
+Output
+
+{
+  "Items": [
+    {
+      "Cust_name": "Ravi Kumar",
+      "State": "Maharashtra",
+      "Zipcode": "411000",
+      "Cust_id": "101",
+      "City": "Pune",
+      "Address": "Camp Road"
+    },
+    {
+      "Cust_name": "Rakesh Kumar",
+      "State": "Maharashtra",
+      "Zipcode": "411043",
+      "Cust_id": "102",
+      "City": "Pune",
+      "Address": "Kothrud"
+    },
+    {
+      "Cust_name": "Ravi",
+      "State": "Maharashtra",
+      "Zipcode": "411041",
+      "Cust_id": "100",
+      "City": "Pune",
+      "Address": "Sinhgad Road"
+    },
+    {
+      "Cust_name": "Madhuri",
+      "State": "Maharashtra",
+      "Zipcode": "411042",
+      "Cust_id": "104",
+      "City": "Pune",
+      "Address": "Swargate"
+    }
+  ],
+  "Count": 4,
+  "ScannedCount": 4
+
+#########################################################################################
+
+4. List details of customer whose customer id is 102 and name
+“Rakesh kumar”.
+
+var params = {
+TableName: "Customer",
+Key: { "Cust_id": "102",
+"Cust_name": "Rakesh Kumar"
+} };
+dynamodb.getItem(params, function(err, data) {
+if (err)
+console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));});
+
+Output
+
+{
+  "Item": {
+    "Cust_name": "Rakesh Kumar",
+    "State": "Maharashtra",
+    "Zipcode": "411043",
+    "Cust_id": "102",
+    "City": "Pune",
+    "Address": "Kothrud"
+  }
+}
+
+#############################################################################################
+5. Give the address and zipcode of customer whose customer id is 102 and name “Rakesh kumar”.
+
+var params = { TableName: "Customer",
+Key: { "Cust_id": "102",
+"Cust_name":"Rakesh Kumar"},
+ProjectionExpression: "Zipcode,Address",
+};
+dynamodb.getItem(params, function(err, data) {
+if (err)
+console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));});
+
+Output
+
+{
+  "Item": {
+    "Zipcode": "411043",
+    "Address": "Kothrud"
+  }
+}
+
+############################################################################################
+6. Give the city of customer whose customer id is 102 and name “Rakesh kumar”.
+
+var params = { TableName: "Customer",
+Key: { "Cust_id": "102",
+"Cust_name":"Rakesh Kumar"},
+ProjectionExpression: "City",
+};
+dynamodb.getItem(params, function(err, data) {
+if (err)
+console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));});
+
+
+Output
+
+{
+  "Item": {
+    "City": "Pune"
+  }
+}
+
+########################################################################
+8. Display all details of customer whose List the customer id is 100.
+
+var params = {
+TableName: "Customer",
+KeyConditionExpression: "Cust_id = :cust_id",
+ExpressionAttributeValues: {
+":cust_id": "100"
+}
+
+};
+dynamodb.query(params, function(err, data) {
+if (err)
+console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));
+});
+
+Ouput
+
+{
+  "Items": [
+    {
+      "Cust_name": "Ravi",
+      "State": "Maharashtra",
+      "Zipcode": "411041",
+      "Cust_id": "100",
+      "City": "Pune",
+      "Address": "Sinhgad Road"
+    }
+  ],
+  "Count": 1,
+  "ScannedCount": 1
+}
+
+#########################################################################
+
+9.Update customer table by adding one attribute Product.
+
+var params = {
+TableName: "Customer",
+Key: {
+"Cust_id":"100",
+"Cust_name":"Ravi"
+},
+UpdateExpression: "SET  Product= :label",
+ExpressionAttributeValues: {
+":label": "Oreo"
+},
+ReturnValues: "ALL_NEW"
+};
+dynamodb.updateItem(params, function(err, data) {
+if (err)
+console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));
+});
+
+
+Ouput
+
+{
+  "Attributes": {
+    "Product": "Oreo",
+    "State": "Maharashtra",
+    "Cust_id": "100",
+    "Address": "Sinhgad Road",
+    "Cust_name": "Ravi",
+    "Zipcode": "411041",
+    "City": "Pune"
+  }
+}
+
+#########################################################################
+10.Delete customer with customer id 104 and Name Madhuri
+
+var params = {
+TableName: "Customer",
+Key: {
+Cust_id: "104",
+Cust_name: "Madhuri"
+}
+};
+dynamodb.deleteItem(params, function(err, data) {
+if (err)
+console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));
+});
+
+#########################################################################
+
+Clean Up
+
+var params = { TableName: "Customer"};
+dynamodb.deleteTable(params, function(err, data) {
+if (err) console.log(JSON.stringify(err, null, 2));
+else
+console.log(JSON.stringify(data, null, 2));});

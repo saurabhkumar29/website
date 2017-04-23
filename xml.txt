@@ -1,0 +1,121 @@
+//stud.xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- New XML document created with EditiX XML Editor (http://www.editix.com) at Fri Apr 21 22:02:32 IST 2017 -->
+
+
+<Students xmlns:xsi="http://www.w3.org/2001/xmlSchema-instance" xsi:noNameSpaceSchemaLocation='Stud.xsd'>
+<Stud>
+
+	<Studid>01</Studid>
+	<StudFname>Vishal</StudFname>
+	<StudLname>Shelake</StudLname>
+	<StudNikname>Bhaya</StudNikname>
+	<StudMarks>61.23</StudMarks>
+</Stud>
+
+<Stud>
+	<Studid>02</Studid>
+	<StudFname>pavan</StudFname>
+	<StudLname>pavar</StudLname>
+	<StudNikname>naralya</StudNikname>
+	<StudMarks>69</StudMarks>
+</Stud>
+
+<Stud>
+	<Studid>03</Studid>
+	<StudFname>Pankaj</StudFname>
+	<StudLname>Kandhare</StudLname>
+	<StudNikname>Dude</StudNikname>
+	<StudMarks>89</StudMarks>
+</Stud>
+
+<Stud>
+	<Studid>04</Studid>
+	<StudFname>ankit</StudFname>
+	<StudLname>barapatre</StudLname>
+	<StudNikname>ankya</StudNikname>
+	<StudMarks>85</StudMarks>
+</Stud>
+
+<Stud>
+	<Studid>05</Studid>
+	<StudFname>guru</StudFname>
+	<StudLname>pawar</StudLname>
+	<StudNikname>chingu</StudNikname>
+	<StudMarks>87</StudMarks>
+</Stud>
+</Students>
+
+
+//stud.xsd
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- New XSD document created with EditiX XML Editor (http://www.editix.com) at Fri Apr 21 21:50:15 IST 2017 -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="Students">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref="Stud" minOccurs="1" maxOccurs="unbounded"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+<xs:element name="Stud">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref="Studid" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element ref="StudFname" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element ref="StudLname" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element ref="StudNikname" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element ref="StudMarks" minOccurs="1" maxOccurs="1"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+<xs:element name="Studid" type="xs:string"></xs:element>
+<xs:element name="StudFname" type="xs:string"></xs:element>
+<xs:element name="StudLname" type="xs:string"></xs:element>
+
+<xs:element name="StudNikname" type="xs:string"></xs:element>
+
+<xs:element name="StudMarks" type="xs:float"></xs:element>
+</xs:schema>
+
+
+//q1
+
+for $x in doc("C:/Users/GURU/myProject/stud.xml")/Students/Stud
+return $x/StudLname
+//q2
+
+
+      for $x in doc("C:/Users/GURU/myProject/stud.xml")/Students/Stud
+      where $x/StudMarks>85
+      order by $x/StudFname 
+      ascending
+      return $x/StudFname
+//q3
+for $x in doc("C:/Users/GURU/myProject/stud.xml") /Students/Stud
+return if ($x/StudMarks<88)
+then <Good>{data($x/StudFname)}</Good>
+else <Excellent>{data($x/StudFname)}</Excellent>
+//q4
+for $x in doc("C:/Users/GURU/myProject/stud.xml")/Students/Stud
+     	where $x/StudMarks>88
+order by $x/StudFname  	descending
+return $x/StudMarks
+//q5
+
+ for $x in doc("C:/Users/GURU/myProject/stud.xml")/Students/Stud
+ where $x/StudFname= "Pankaj" and $x/StudMarks = "89"
+ return $x/StudNikname
+
+//q6
+<ul>
+{
+for $x in doc("C:/Users/GURU/myProject/stud.xml")/Students/Stud
+order by $x/StudLname
+return <li>{$x/StudLname}</li>
+}
+</ul>
