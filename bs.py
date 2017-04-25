@@ -1,3 +1,6 @@
+# Author: Khalid - naam toh suna hi hoga
+# Steps to run ->
+# :~$ python yoyo.py
 
 def bubbleSort(a,n) :
     i = 0
