@@ -1,6 +1,3 @@
-# Author: Khalid - naam toh suna hi hoga
-# Steps to run ->
-# :~$ python yoyo.py
 
 def bubbleSort(a,n) :
     i = 0
@@ -17,14 +14,12 @@ def bubbleSort(a,n) :
 print("Enter size of array : ")
 n = int(input())
 print("Enter unsorted elements of array : ")
-a = [] # take care - python doesn't have arrays (lists are used instead)
+a = [] 
 i = 0
 while i<n :
     a.append(int(input()))
     i = i + 1
 
-# a.sort() # sort is built-in for lists - a better option is sorted
-# since size matters, a bubbleSort function is added but a.sort() is more optimal
 bubbleSort(a,n)
 
 
